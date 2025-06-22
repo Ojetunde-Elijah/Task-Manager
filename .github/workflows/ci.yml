@@ -1,42 +1,116 @@
+# name: CI - Build & Lint
+
+# on:
+#   push:
+#     branches: [master, dev]
+#   pull_request:
+#     branches: [master, dev]
+
+# jobs:
+#   build-and-lint:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v3
+
+#       - name: Setup Node
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 20
+
+#       - name: Install backend dependencies
+#         working-directory: server
+#         run: npm ci
+
+#       - name: Lint backend
+#         working-directory: server
+#         run: npm run lint || echo "Lint failed"
+
+#       - name: Install frontend dependencies
+#         working-directory: client
+#         run: npm ci
+
+#       - name: Lint frontend
+#         working-directory: client
+#         run: npm run lint || echo "Lint failed"
+
+#       - name: Build backend image
+#         run: docker build -t backend ./server
+
+#       - name: Build frontend image
+#         run: docker build -t frontend ./client
+
+# 🛠️ Workflow Name
+# This is just a label shown in the GitHub Actions UI.
 name: CI - Build & Lint
 
+# 📌 Triggers: Define when this workflow should run
 on:
+  # ✅ Trigger on push to these branches
   push:
     branches: [master, dev]
+  # ✅ Also run this on pull requests targeting these branches
   pull_request:
     branches: [master, dev]
 
+# 🚀 Define a Job (You can have multiple jobs. Here we have only one.)
 jobs:
   build-and-lint:
+    # 🧑‍💻 Runs on the latest Ubuntu-based runner provided by GitHub
     runs-on: ubuntu-latest
 
+    # 🪜 All steps of this job run sequentially in this array
     steps:
+      # ✅ Step 1: Check out your repository code
+      # Required so GitHub runner has access to your project files
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # ✅ Step 2: Set up Node.js environment (same version as your local dev)
+      # This allows future `npm` commands to work
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 20 # Make sure this matches your project's Node version
 
+      # ✅ Step 3: Install backend dependencies using clean, CI-friendly method
+      # `npm ci` is faster and ensures reproducible installs using package-lock.json
       - name: Install backend dependencies
         working-directory: server
         run: npm ci
 
+      # ✅ Step 4: Run ESLint for backend code (JavaScript linting)
+      # ⛔️ CAUTION: Currently using `|| echo` — this will NOT fail the pipeline!
+      # Replace with strict version below to make CI fail if lint fails.
       - name: Lint backend
         working-directory: server
-        run: npm run lint || echo "Lint failed"
+        run: |
+          npm run lint || {
+            echo "❌ Linting failed for backend";
+            exit 1;
+          }
 
+      # ✅ Step 5: Install frontend dependencies
       - name: Install frontend dependencies
         working-directory: client
         run: npm ci
 
+      # ✅ Step 6: Run ESLint for frontend (React/Vite)
       - name: Lint frontend
         working-directory: client
-        run: npm run lint || echo "Lint failed"
+        run: |
+          npm run lint || {
+            echo "❌ Linting failed for frontend";
+            exit 1;
+          }
 
+      # ✅ Step 7: Build Docker image for backend
+      # This simulates the image build process (used later for deploy/CD)
+      # No need to run it, just ensure Dockerfile works correctly
       - name: Build backend image
         run: docker build -t backend ./server
 
+      # ✅ Step 8: Build Docker image for frontend
       - name: Build frontend image
         run: docker build -t frontend ./client
