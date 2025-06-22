@@ -44,6 +44,8 @@ const AddTaskDialog = ({ onClose, onSubmit }) => {
         setError(result.error || 'Failed to create task');
       }
     } catch (err) {
+      console.log(err);
+
       setError('An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
