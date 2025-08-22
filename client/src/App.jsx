@@ -61,6 +61,7 @@ function App() {
   };
 
   const data = 'sangam';
+  const data2 = 'sangam';
 
   return (
     <div className="min-h-screen bg-gray-50">
