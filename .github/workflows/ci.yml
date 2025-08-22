@@ -1,6 +1,6 @@
 # 🛠️ Workflow Name
 # This is just a label shown in the GitHub Actions UI.
-name: CI - Build & Lint
+name: build-and-lint
 
 # 📌 Triggers: Define when this workflow should run
 on:
@@ -42,11 +42,7 @@ jobs:
       # Replace with strict version below to make CI fail if lint fails.
       - name: Lint backend
         working-directory: server
-        run: |
-          npm run lint || {
-            echo "❌ Linting failed for backend";
-            exit 1;
-          }
+        run: npm run lint -- --max-warnings=0
 
       # ✅ Step 5: Install frontend dependencies
       - name: Install frontend dependencies
@@ -56,11 +52,7 @@ jobs:
       # ✅ Step 6: Run ESLint for frontend (React/Vite)
       - name: Lint frontend
         working-directory: client
-        run: |
-          npm run lint || {
-            echo "❌ Linting failed for frontend";
-            exit 1;
-          }
+        run: npm run lint -- --max-warnings=0
 
       # ✅ Step 7: Build Docker image for backend
       # This simulates the image build process (used later for deploy/CD)
