@@ -60,11 +60,6 @@ function App() {
     fetchTasks();
   };
 
-  const data = 'sangam';
-  const data2 = 'sangam';
-  const data3 = 'sangam';
-  const data4 = 'sangam';
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
