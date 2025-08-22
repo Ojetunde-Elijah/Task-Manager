@@ -1,36 +1,65 @@
-version: "3.8"
 
 services:
-  mongo:
-    image: mongo
-    container_name: mongo
-    restart: always
-    volumes:
-      - mongo-data:/data/db
-    ports:
-      - "27017:27017"
-
+  # -------------------------------
+  # Backend (Express / Node.js API)
+  # -------------------------------
   backend:
+    # Build image from the Dockerfile inside ./server directory
     build: ./server
+
+    # Name of the container (helps with docker ps/logs)
     container_name: backend
+
+    # Restart automatically if it crashes or Docker restarts
     restart: always
+
+    # Load environment variables from ./server/.env
+    # IMPORTANT: For Atlas, this file should contain:
+    #   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.hajgu3b.mongodb.net/mydb?retryWrites=true&w=majority
+    #   PORT=5000
+    #   NODE_ENV=development
     env_file:
       - ./server/.env
+
+    # Map container port 5000 -> host port 5000
+    # Reach the API at http://localhost:5000
     ports:
       - "5000:5000"
-    depends_on:
-      - mongo
 
+    # NOTE: No depends_on for mongo here because we are NOT running a local MongoDB container.
+    # The backend will connect directly to Atlas over the internet using MONGODB_URI.
+
+  # -------------------------------
+  # Frontend (React / Vite)
+  # -------------------------------
   frontend:
+    # Build image from the Dockerfile inside ./client directory
     build: ./client
+
+    # Name of the container
     container_name: frontend
+
+    # Restart automatically if it crashes or Docker restarts
     restart: always
+
+    # Load environment variables from ./client/.env
+    # IMPORTANT for browser calls:
+    #   VITE_API_URL=http://localhost:5000/api
+    # (The React app runs in your browser on the host; it must call the API via localhost.)
     env_file:
       - ./client/.env
+
+    # Map container port 5173 -> host port 5173
+    # Reach the React app at http://localhost:5173
     ports:
       - "5173:5173"
+
+    # Start frontend after backend so the API is ready when the UI loads
     depends_on:
       - backend
 
-volumes:
-  mongo-data:
+# --------------------------------
+# No "mongo" service and no volumes block:
+# - We are using MongoDB Atlas (cloud), not a local Mongo container.
+# - Persistence/backups/replication are handled by Atlas itself.
+# --------------------------------
