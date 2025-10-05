@@ -2,9 +2,9 @@ name: build-and-deploy
 
 on:
   push:
-    branches: [master] # CD on push to master
+    branches: [main] # CD on push to master
   pull_request:
-    branches: [master, dev] # CI on PRs
+    branches: [main, dev] # CI on PRs
 
 jobs:
   # ----- CI: Lint + Build -----
